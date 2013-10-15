@@ -16,6 +16,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		'name' => 'App',
 		'useLogger' => TRUE
 	];
+	
 	private $useLogger;
 
 
@@ -47,9 +48,11 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 			$logger->addSetup('pushProcessor', [$this->prefix('@' . $processorName)]);
 		}
 
-		$containerBuilder->addDefinition($this->prefix('adapter'))
-				->addTag('logger')
-				->setClass('MonologAdapter', [$this->prefix('@logger')]);
+		$containerBuilder
+			->addDefinition($this->prefix('adapter'))
+			->addTag('logger')
+			->setClass('Bazo\Monolog\Adapter\MonologAdapter', [$this->prefix('@logger')])
+		;
 
 		$this->useLogger = $config['useLogger'];
 	}
@@ -59,7 +62,6 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 	{
 		if ($this->useLogger === TRUE) {
 			$initialize = $class->methods['initialize'];
-
 			$initialize->addBody('\Nette\Diagnostics\Debugger::$logger = $this->getService(?);', [$this->prefix('adapter')]);
 		}
 	}
