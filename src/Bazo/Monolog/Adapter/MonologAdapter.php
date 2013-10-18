@@ -5,7 +5,7 @@ namespace Bazo\Monolog\Adapter;
 use Monolog\Logger;
 
 /**
- * Description of MonologAdapter
+ * MonologAdapter
  *
  * @author Martin Bažík <martin@bazo.sk>
  */
@@ -22,14 +22,14 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 	public function log($message, $priority = self::INFO)
 	{
 		$levelMap = array(
-			self::DEBUG => Monolog\Logger::DEBUG,
-			self::CRITICAL => Monolog\Logger::CRITICAL,
-			self::ERROR => Monolog\Logger::ERROR,
-			self::INFO => Monolog\Logger::INFO,
-			self::WARNING => Monolog\Logger::WARNING
+			self::DEBUG => Logger::DEBUG,
+			self::CRITICAL => Logger::CRITICAL,
+			self::ERROR => Logger::ERROR,
+			self::INFO => Logger::INFO,
+			self::WARNING => Logger::WARNING
 		);
 
-		$level = isset($levelMap[$priority]) ? $levelMap[$priority] : Monolog\Logger::ERROR;
+		$level = isset($levelMap[$priority]) ? $levelMap[$priority] : Logger::ERROR;
 		return $this->monolog->log($level, $message[1].$message[2]);
 	}
 
