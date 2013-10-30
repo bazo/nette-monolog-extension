@@ -35,6 +35,8 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 				return $this->monolog->addInfo($message[1] . $message[2]);
 			case self::WARNING:
 				return $this->monolog->addWarning($message[1] . $message[2]);
+			case 'access':
+				return $this->monolog->addNotice($message[1] . $message[2]);
 		}
 	}
 
