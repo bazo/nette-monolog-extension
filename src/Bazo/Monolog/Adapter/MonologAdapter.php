@@ -11,31 +11,47 @@ use Monolog\Logger;
  */
 class MonologAdapter extends \Nette\Diagnostics\Logger
 {
+
 	/** @var Logger */
 	private $monolog;
 
-	function __construct(Logger $monolog)
+
+	public function __construct(Logger $monolog)
 	{
 		$this->monolog = $monolog;
 	}
 
+
 	public function log($message, $priority = self::INFO)
 	{
-		$levelMap = array(
-			self::DEBUG => Logger::DEBUG,
-			self::CRITICAL => Logger::CRITICAL,
-			self::ERROR => Logger::ERROR,
-			self::INFO => Logger::INFO,
-			self::WARNING => Logger::WARNING
-		);
 
-		$level = isset($levelMap[$priority]) ? $levelMap[$priority] : Logger::ERROR;
-		return $this->monolog->log($level, $message[1].$message[2]);
+		switch ($priority) {
+			case self::DEBUG:
+				$res = $this->monolog->addDebug($message[1] . $message[2]);
+				break;
+			case self::CRITICAL:
+				$res = $this->monolog->addCritical($message[1] . $message[2]);
+				break;
+			case self::ERROR:
+				$res = $this->monolog->addError($message[1] . $message[2]);
+				break;
+			case self::INFO:
+				$res = $this->monolog->addInfo($message[1] . $message[2]);
+				break;
+			case self::WARNING:
+				$res = $this->monolog->addWarning($message[1] . $message[2]);
+				break;
+		}
+
+		return $res;
 	}
+
 
 	public static function register(Logger $monolog)
 	{
 		\Nette\Diagnostics\Debugger::$logger = new static($monolog);
 	}
+
+
 }
 
