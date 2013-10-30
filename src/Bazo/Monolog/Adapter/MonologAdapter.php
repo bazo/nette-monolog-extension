@@ -24,7 +24,6 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 
 	public function log($message, $priority = self::INFO)
 	{
-
 		switch ($priority) {
 			case self::DEBUG:
 				return $this->monolog->addDebug($message[1] . $message[2]);
