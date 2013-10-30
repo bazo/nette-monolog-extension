@@ -27,23 +27,16 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 
 		switch ($priority) {
 			case self::DEBUG:
-				$res = $this->monolog->addDebug($message[1] . $message[2]);
-				break;
+				return $this->monolog->addDebug($message[1] . $message[2]);
 			case self::CRITICAL:
-				$res = $this->monolog->addCritical($message[1] . $message[2]);
-				break;
+				return $this->monolog->addCritical($message[1] . $message[2]);
 			case self::ERROR:
-				$res = $this->monolog->addError($message[1] . $message[2]);
-				break;
+				return $this->monolog->addError($message[1] . $message[2]);
 			case self::INFO:
-				$res = $this->monolog->addInfo($message[1] . $message[2]);
-				break;
+				return $this->monolog->addInfo($message[1] . $message[2]);
 			case self::WARNING:
-				$res = $this->monolog->addWarning($message[1] . $message[2]);
-				break;
+				return $this->monolog->addWarning($message[1] . $message[2]);
 		}
-
-		return $res;
 	}
 
 
