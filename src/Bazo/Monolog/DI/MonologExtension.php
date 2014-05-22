@@ -2,6 +2,10 @@
 
 namespace Bazo\Monolog\DI;
 
+use Nette\PhpGenerator\PhpLiteral;
+
+
+
 /**
  * Monolog extension
  *
@@ -29,6 +33,14 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 		$builder->addDefinition($this->prefix('logger'))
 				->setClass('Monolog\Logger', [$config['name']]);
+
+		if (empty($config['handlers'])) {
+			$code = method_exists('Nette\Diagnostics\Debugger', 'getLogger')
+				? 'Nette\Diagnostics\Debugger::getLogger()'
+				: 'Nette\Diagnostics\Debugger::$logger';
+
+			$config['handlers'][] = (object) array('value' => 'Bazo\Monolog\Handler\FallbackNetteHandler', 'attributes' => array(new PhpLiteral($code)));
+		}
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
 			$this->compiler->parseServices($builder, array(
