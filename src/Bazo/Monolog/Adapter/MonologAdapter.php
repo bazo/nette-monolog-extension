@@ -43,11 +43,10 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 
 		switch ($priority) {
 			case 'access':
-				$this->monolog->addNotice($normalised, array('priority' => $priority));
-				break;
+				return $this->monolog->addNotice($normalised, array('priority' => $priority));
 
 			default:
-				$this->monolog->addRecord($level, $normalised, array('priority' => $priority));
+				return $this->monolog->addRecord($level, $normalised, array('priority' => $priority));
 		}
 	}
 
