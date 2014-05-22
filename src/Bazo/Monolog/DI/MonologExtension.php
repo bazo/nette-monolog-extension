@@ -17,43 +17,38 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		'handlers' => [],
 		'processors' => [],
 		'name' => 'App',
-		'useLogger' => TRUE
+		'hookToTracy' => TRUE
 	];
-	
-	private $useLogger;
+
 
 
 	public function loadConfiguration()
 	{
-		$containerBuilder = $this->getContainerBuilder();
+		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
 
-		$containerBuilder->addDefinition($this->prefix('logger'))
+		$builder->addDefinition($this->prefix('logger'))
 				->setClass('Monolog\Logger', [$config['name']]);
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
-			$this->compiler->parseServices($containerBuilder, array(
+			$this->compiler->parseServices($builder, array(
 				'services' => array($serviceName = $this->prefix('handler.' . $handlerName) => $implementation),
 			));
 
-			$containerBuilder->getDefinition($serviceName)->addTag(self::TAG_HANDLER);
+			$builder->getDefinition($serviceName)->addTag(self::TAG_HANDLER);
 		}
 
 		foreach ($config['processors'] as $processorName => $implementation) {
-			$this->compiler->parseServices($containerBuilder, array(
+			$this->compiler->parseServices($builder, array(
 				'services' => array($serviceName = $this->prefix('processor.' . $processorName) => $implementation),
 			));
 
-			$containerBuilder->getDefinition($serviceName)->addTag(self::TAG_PROCESSOR);
+			$builder->getDefinition($serviceName)->addTag(self::TAG_PROCESSOR);
 		}
 
-		$containerBuilder
-			->addDefinition($this->prefix('adapter'))
-			->addTag('logger')
+		$builder->addDefinition($this->prefix('adapter'))
 			->setClass('Bazo\Monolog\Adapter\MonologAdapter', [$this->prefix('@logger')])
-		;
-
-		$this->useLogger = $config['useLogger'];
+			->addTag('logger');
 	}
 
 
@@ -76,12 +71,21 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 	public function afterCompile(\Nette\PhpGenerator\ClassType $class)
 	{
-		if ($this->useLogger === TRUE) {
+		$config = $this->getConfig($this->defaults);
+
+		if ($config['hookToTracy'] === TRUE) {
 			$initialize = $class->methods['initialize'];
-			$initialize->addBody('\Nette\Diagnostics\Debugger::$logger = $this->getService(?);', [$this->prefix('adapter')]);
+
+			if (method_exists('Nette\Diagnostics\Debugger', 'setLogger')) {
+				$code = '\Nette\Diagnostics\Debugger::setLogger($this->getService(?));';
+
+			} else {
+				$code = '\Nette\Diagnostics\Debugger::$logger = $this->getService(?);';
+			}
+
+			$initialize->addBody($code, [$this->prefix('adapter')]);
 		}
 	}
-
 
 }
 
