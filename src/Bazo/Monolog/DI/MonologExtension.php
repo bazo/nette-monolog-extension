@@ -10,6 +10,9 @@ namespace Bazo\Monolog\DI;
 class MonologExtension extends \Nette\DI\CompilerExtension
 {
 
+	const TAG_HANDLER = 'monolog.handler';
+	const TAG_PROCESSOR = 'monolog.processor';
+
 	private $defaults = [
 		'handlers' => [],
 		'processors' => [],
@@ -25,27 +28,23 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		$containerBuilder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
 
-		$logger = $containerBuilder->addDefinition($this->prefix('logger'))
+		$containerBuilder->addDefinition($this->prefix('logger'))
 				->setClass('Monolog\Logger', [$config['name']]);
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
-			$this->compiler->parseServices($containerBuilder, [
-				'services' => [
-					$this->prefix($handlerName) => $implementation,
-				],
-			]);
+			$this->compiler->parseServices($containerBuilder, array(
+				'services' => array($serviceName = $this->prefix('handler.' . $handlerName) => $implementation),
+			));
 
-			$logger->addSetup('pushHandler', [$this->prefix('@' . $handlerName)]);
+			$containerBuilder->getDefinition($serviceName)->addTag(self::TAG_HANDLER);
 		}
 
 		foreach ($config['processors'] as $processorName => $implementation) {
-			$this->compiler->parseServices($containerBuilder, [
-				'services' => [
-					$this->prefix($processorName) => $implementation,
-				],
-			]);
+			$this->compiler->parseServices($containerBuilder, array(
+				'services' => array($serviceName = $this->prefix('processor.' . $processorName) => $implementation),
+			));
 
-			$logger->addSetup('pushProcessor', [$this->prefix('@' . $processorName)]);
+			$containerBuilder->getDefinition($serviceName)->addTag(self::TAG_PROCESSOR);
 		}
 
 		$containerBuilder
@@ -56,6 +55,23 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 		$this->useLogger = $config['useLogger'];
 	}
+
+
+
+	public function beforeCompile()
+	{
+		$builder = $this->getContainerBuilder();
+		$logger = $builder->getDefinition($this->prefix('logger'));
+
+		foreach ($builder->findByTag(self::TAG_HANDLER) as $serviceName => $meta) {
+			$logger->addSetup('pushHandler', array('@' . $serviceName));
+		}
+
+		foreach ($builder->findByTag(self::TAG_PROCESSOR) as $serviceName => $meta) {
+			$logger->addSetup('pushProcessor', array('@' . $serviceName));
+		}
+	}
+
 
 
 	public function afterCompile(\Nette\PhpGenerator\ClassType $class)
