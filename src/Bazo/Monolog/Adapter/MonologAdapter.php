@@ -4,6 +4,7 @@ namespace Bazo\Monolog\Adapter;
 
 use Bazo\Monolog\Handler\FallbackNetteHandler;
 use Monolog\Logger;
+use Nette\Diagnostics\Debugger;
 
 
 
@@ -57,12 +58,12 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 		$adapter = new static($monolog);
 
 		if (method_exists('Nette\Diagnostics\Debugger', 'setLogger')) {
-			$monolog->pushHandler(new FallbackNetteHandler(\Nette\Diagnostics\Debugger::getLogger()));
-			\Nette\Diagnostics\Debugger::setLogger($adapter);
+			$monolog->pushHandler(new FallbackNetteHandler(Debugger::getLogger()));
+			Debugger::setLogger($adapter);
 
 		} else {
-			$monolog->pushHandler(new FallbackNetteHandler(\Nette\Diagnostics\Debugger::$logger));
-			\Nette\Diagnostics\Debugger::$logger = $adapter;
+			$monolog->pushHandler(new FallbackNetteHandler(Debugger::$logger));
+			Debugger::$logger = $adapter;
 		}
 
 		return $adapter;
