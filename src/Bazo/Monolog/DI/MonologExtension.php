@@ -21,7 +21,8 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		'handlers' => [],
 		'processors' => [],
 		'name' => 'App',
-		'hookToTracy' => TRUE
+		'hookToTracy' => TRUE,
+		'registerFallback' => TRUE,
 	];
 
 
@@ -34,7 +35,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		$builder->addDefinition($this->prefix('logger'))
 				->setClass('Monolog\Logger', [$config['name']]);
 
-		if (empty($config['handlers'])) {
+		if (empty($config['handlers']) || $config['registerFallback']) {
 			$code = method_exists('Nette\Diagnostics\Debugger', 'getLogger')
 				? 'Nette\Diagnostics\Debugger::getLogger()'
 				: 'Nette\Diagnostics\Debugger::$logger';
