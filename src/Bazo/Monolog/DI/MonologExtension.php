@@ -2,6 +2,11 @@
 
 namespace Bazo\Monolog\DI;
 
+use Nette\DI\Statement;
+use Nette\PhpGenerator\PhpLiteral;
+
+
+
 /**
  * Monolog extension
  *
@@ -10,62 +15,96 @@ namespace Bazo\Monolog\DI;
 class MonologExtension extends \Nette\DI\CompilerExtension
 {
 
+	const TAG_HANDLER = 'monolog.handler';
+	const TAG_PROCESSOR = 'monolog.processor';
+
 	private $defaults = [
 		'handlers' => [],
 		'processors' => [],
 		'name' => 'App',
-		'useLogger' => TRUE
+		'hookToTracy' => TRUE,
+		// 'registerFallback' => TRUE,
 	];
-	
-	private $useLogger;
+
 
 
 	public function loadConfiguration()
 	{
-		$containerBuilder = $this->getContainerBuilder();
+		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
 
-		$logger = $containerBuilder->addDefinition($this->prefix('logger'))
+		$builder->addDefinition($this->prefix('logger'))
 				->setClass('Monolog\Logger', [$config['name']]);
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
-			$this->compiler->parseServices($containerBuilder, [
-				'services' => [
-					$this->prefix($handlerName) => $implementation,
-				],
-			]);
+			$this->compiler->parseServices($builder, array(
+				'services' => array($serviceName = $this->prefix('handler.' . $handlerName) => $implementation),
+			));
 
-			$logger->addSetup('pushHandler', [$this->prefix('@' . $handlerName)]);
+			$builder->getDefinition($serviceName)->addTag(self::TAG_HANDLER);
 		}
 
 		foreach ($config['processors'] as $processorName => $implementation) {
-			$this->compiler->parseServices($containerBuilder, [
-				'services' => [
-					$this->prefix($processorName) => $implementation,
-				],
-			]);
+			$this->compiler->parseServices($builder, array(
+				'services' => array($serviceName = $this->prefix('processor.' . $processorName) => $implementation),
+			));
 
-			$logger->addSetup('pushProcessor', [$this->prefix('@' . $processorName)]);
+			$builder->getDefinition($serviceName)->addTag(self::TAG_PROCESSOR);
 		}
 
-		$containerBuilder
-			->addDefinition($this->prefix('adapter'))
-			->addTag('logger')
+		$builder->addDefinition($this->prefix('adapter'))
 			->setClass('Bazo\Monolog\Adapter\MonologAdapter', [$this->prefix('@logger')])
-		;
-
-		$this->useLogger = $config['useLogger'];
+			->addTag('logger');
 	}
+
+
+
+	public function beforeCompile()
+	{
+		$builder = $this->getContainerBuilder();
+
+		$logger = $builder->getDefinition($this->prefix('logger'));
+
+		foreach ($handlers = $builder->findByTag(self::TAG_HANDLER) as $serviceName => $meta) {
+			$logger->addSetup('pushHandler', array('@' . $serviceName));
+		}
+
+		foreach ($builder->findByTag(self::TAG_PROCESSOR) as $serviceName => $meta) {
+			$logger->addSetup('pushProcessor', array('@' . $serviceName));
+		}
+
+		$config = $this->getConfig(array('registerFallback' => empty($handlers)) + $this->getConfig($this->defaults));
+
+		if ($config['registerFallback']) {
+			$code = method_exists('Nette\Diagnostics\Debugger', 'getLogger')
+				? 'Nette\Diagnostics\Debugger::getLogger()'
+				: 'Nette\Diagnostics\Debugger::$logger';
+
+			$logger->addSetup('pushHandler', array(
+				new Statement('Bazo\Monolog\Handler\FallbackNetteHandler', array(new PhpLiteral($code)))
+			));
+		}
+	}
+
 
 
 	public function afterCompile(\Nette\PhpGenerator\ClassType $class)
 	{
-		if ($this->useLogger === TRUE) {
+		$config = $this->getConfig($this->defaults);
+
+		if ($config['hookToTracy'] === TRUE) {
 			$initialize = $class->methods['initialize'];
-			$initialize->addBody('\Nette\Diagnostics\Debugger::$logger = $this->getService(?);', [$this->prefix('adapter')]);
+
+			if (method_exists('Nette\Diagnostics\Debugger', 'setLogger')) {
+				$code = '\Nette\Diagnostics\Debugger::setLogger($this->getService(?));';
+
+			} else {
+				$code = '\Nette\Diagnostics\Debugger::$logger = $this->getService(?);';
+			}
+
+			$initialize->addBody($code, [$this->prefix('adapter')]);
 		}
 	}
-
 
 }
 

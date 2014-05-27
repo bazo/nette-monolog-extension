@@ -2,7 +2,11 @@
 
 namespace Bazo\Monolog\Adapter;
 
+use Bazo\Monolog\Handler\FallbackNetteHandler;
 use Monolog\Logger;
+use Nette\Diagnostics\Debugger;
+
+
 
 /**
  * MonologAdapter
@@ -16,36 +20,54 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 	private $monolog;
 
 
+
 	public function __construct(Logger $monolog)
 	{
 		$this->monolog = $monolog;
 	}
 
 
+
 	public function log($message, $priority = self::INFO)
 	{
+		$normalised = $message;
+		if (is_array($message)) {
+			if (count($message) >= 2) {
+				array_shift($message); // first entry is probably time
+			}
+
+			$normalised = implode($message);
+		}
+
+		$levels = $this->monolog->getLevels();
+		$level = isset($levels[$uPriority = strtoupper($priority)]) ? $levels[$uPriority] : Logger::INFO;
+
 		switch ($priority) {
-			case self::DEBUG:
-				return $this->monolog->addDebug($message[1] . $message[2]);
-			case self::CRITICAL:
-				return $this->monolog->addCritical($message[1] . $message[2]);
-			case self::ERROR:
-				return $this->monolog->addError($message[1] . $message[2]);
-			case self::INFO:
-				return $this->monolog->addInfo($message[1] . $message[2]);
-			case self::WARNING:
-				return $this->monolog->addWarning($message[1] . $message[2]);
 			case 'access':
-				return $this->monolog->addNotice($message[1] . $message[2]);
+				return $this->monolog->addInfo($normalised, array('priority' => $priority));
+
+			default:
+				return $this->monolog->addRecord($level, $normalised, array('priority' => $priority));
 		}
 	}
 
 
+
 	public static function register(Logger $monolog)
 	{
-		\Nette\Diagnostics\Debugger::$logger = new static($monolog);
-	}
+		$adapter = new static($monolog);
 
+		if (method_exists('Nette\Diagnostics\Debugger', 'setLogger')) {
+			$monolog->pushHandler(new FallbackNetteHandler(Debugger::getLogger()));
+			Debugger::setLogger($adapter);
+
+		} else {
+			$monolog->pushHandler(new FallbackNetteHandler(Debugger::$logger));
+			Debugger::$logger = $adapter;
+		}
+
+		return $adapter;
+	}
 
 }
 
