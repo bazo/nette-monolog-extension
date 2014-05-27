@@ -2,6 +2,7 @@
 
 namespace Bazo\Monolog\DI;
 
+use Nette\DI\Statement;
 use Nette\PhpGenerator\PhpLiteral;
 
 
@@ -22,7 +23,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		'processors' => [],
 		'name' => 'App',
 		'hookToTracy' => TRUE,
-		'registerFallback' => TRUE,
+		// 'registerFallback' => TRUE,
 	];
 
 
@@ -34,14 +35,6 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 		$builder->addDefinition($this->prefix('logger'))
 				->setClass('Monolog\Logger', [$config['name']]);
-
-		if (empty($config['handlers']) || $config['registerFallback']) {
-			$code = method_exists('Nette\Diagnostics\Debugger', 'getLogger')
-				? 'Nette\Diagnostics\Debugger::getLogger()'
-				: 'Nette\Diagnostics\Debugger::$logger';
-
-			$config['handlers'][] = (object) array('value' => 'Bazo\Monolog\Handler\FallbackNetteHandler', 'attributes' => array(new PhpLiteral($code)));
-		}
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
 			$this->compiler->parseServices($builder, array(
@@ -69,6 +62,9 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
+		$config = $this->getConfig($this->defaults);
+		$config = $this->getConfig(array('registerFallback' => empty($config['handlers'])) + $config);
+
 		$logger = $builder->getDefinition($this->prefix('logger'));
 
 		foreach ($builder->findByTag(self::TAG_HANDLER) as $serviceName => $meta) {
@@ -77,6 +73,16 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 		foreach ($builder->findByTag(self::TAG_PROCESSOR) as $serviceName => $meta) {
 			$logger->addSetup('pushProcessor', array('@' . $serviceName));
+		}
+
+		if ($config['registerFallback']) {
+			$code = method_exists('Nette\Diagnostics\Debugger', 'getLogger')
+				? 'Nette\Diagnostics\Debugger::getLogger()'
+				: 'Nette\Diagnostics\Debugger::$logger';
+
+			$logger->addSetup('pushHandler', array(
+				new Statement('Bazo\Monolog\Handler\FallbackNetteHandler', array(new PhpLiteral($code)))
+			));
 		}
 	}
 
