@@ -37,7 +37,7 @@ class FallbackNetteHandler extends AbstractProcessingHandler
 	 */
 	protected function write(array $record)
 	{
-		$priority = isset($record['context']['priority']) ? $record['context']['priority'] : strtolower($record['level_name']);
+		$priority = $record['channel'] === 'damejidlo' ? strtolower($record['level_name']) : $record['channel'];
 		$this->logger->log(array($record['datetime']->format('[Y-m-d H-i-s]'), $record['message']), $priority);
 	}
 
