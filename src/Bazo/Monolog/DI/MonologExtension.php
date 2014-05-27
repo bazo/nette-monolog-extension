@@ -62,18 +62,18 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
-		$config = $this->getConfig($this->defaults);
-		$config = $this->getConfig(array('registerFallback' => empty($config['handlers'])) + $config);
 
 		$logger = $builder->getDefinition($this->prefix('logger'));
 
-		foreach ($builder->findByTag(self::TAG_HANDLER) as $serviceName => $meta) {
+		foreach ($handlers = $builder->findByTag(self::TAG_HANDLER) as $serviceName => $meta) {
 			$logger->addSetup('pushHandler', array('@' . $serviceName));
 		}
 
 		foreach ($builder->findByTag(self::TAG_PROCESSOR) as $serviceName => $meta) {
 			$logger->addSetup('pushProcessor', array('@' . $serviceName));
 		}
+
+		$config = $this->getConfig(array('registerFallback' => empty($handlers)) + $this->getConfig($this->defaults));
 
 		if ($config['registerFallback']) {
 			$code = method_exists('Nette\Diagnostics\Debugger', 'getLogger')
