@@ -13,7 +13,6 @@ namespace Kdyby\Monolog\Handler;
 use Kdyby;
 use Monolog\Handler\AbstractProcessingHandler;
 use Nette;
-use Tracy\Debugger;
 use Tracy\Logger;
 
 
