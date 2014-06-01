@@ -18,10 +18,16 @@
 		}
 	],
 	"require": {
-		"nette/nette": "2.1.*",
+		"nette/di": "2.2.*",
+		"tracy/tracy": "2.2.*",
+
 		"monolog/monolog": "~1.9"
 	},
 	"require-dev": {
+		"nette/nette": "2.2.*",
+		"nette/bootstrap": "2.2.*",
+		"nette/neon": "2.2.*",
+
 		"nette/tester": "@dev",
 		"jakub-onderka/php-parallel-lint": "~0.6"
 	},

@@ -17,14 +17,6 @@ use Tracy\Logger;
 
 
 
-if (!class_exists('Tracy\Debugger')) {
-	class_alias('Nette\Diagnostics\Debugger', 'Tracy\Debugger');
-}
-
-if (!class_exists('Tracy\Logger')) {
-	class_alias('Nette\Diagnostics\Logger', 'Tracy\Logger');
-}
-
 /**
  * @author Martin Bažík <martin@bazo.sk>
  * @author Filip Procházka <filip@prochazka.su>
