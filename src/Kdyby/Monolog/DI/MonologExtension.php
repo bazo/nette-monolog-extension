@@ -40,13 +40,13 @@ class MonologExtension extends CompilerExtension
 	const TAG_HANDLER = 'monolog.handler';
 	const TAG_PROCESSOR = 'monolog.processor';
 
-	private $defaults = [
-		'handlers' => [],
-		'processors' => [],
+	private $defaults = array(
+		'handlers' => array(),
+		'processors' => array(),
 		'name' => 'App',
 		'hookToTracy' => TRUE,
 		// 'registerFallback' => TRUE,
-	];
+	);
 
 
 
@@ -75,7 +75,7 @@ class MonologExtension extends CompilerExtension
 		}
 
 		$builder->addDefinition($this->prefix('adapter'))
-			->setClass('Kdyby\Monolog\Diagnostics\MonologAdapter', [$this->prefix('@logger')])
+			->setClass('Kdyby\Monolog\Diagnostics\MonologAdapter', array($this->prefix('@logger')))
 			->addTag('logger');
 	}
 
@@ -124,7 +124,7 @@ class MonologExtension extends CompilerExtension
 				$code = '\Nette\Diagnostics\Debugger::$logger = $this->getService(?);';
 			}
 
-			$initialize->addBody($code, [$this->prefix('adapter')]);
+			$initialize->addBody($code, array($this->prefix('adapter')));
 		}
 	}
 
