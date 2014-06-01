@@ -56,7 +56,7 @@ class MonologExtension extends CompilerExtension
 		$config = $this->getConfig($this->defaults);
 
 		$builder->addDefinition($this->prefix('logger'))
-				->setClass('Monolog\Logger', [$config['name']]);
+				->setClass('Monolog\Logger', array($config['name']));
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
 			$this->compiler->parseServices($builder, array(
