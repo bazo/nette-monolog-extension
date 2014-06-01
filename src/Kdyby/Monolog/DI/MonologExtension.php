@@ -1,18 +1,40 @@
 <?php
 
-namespace Bazo\Monolog\DI;
+/**
+ * This file is part of the Kdyby (http://www.kdyby.org)
+ *
+ * Copyright (c) 2008 Filip Procházka (filip@prochazka.su)
+ *
+ * For the full copyright and license information, please view the file license.md that was distributed with this source code.
+ */
 
+namespace Kdyby\Monolog\DI;
+
+use Nette;
+use Nette\Configurator;
+use Nette\DI\Compiler;
+use Nette\DI\CompilerExtension;
 use Nette\DI\Statement;
-use Nette\PhpGenerator\PhpLiteral;
+use Nette\PhpGenerator as Code;
 
 
+
+if (!class_exists('Nette\DI\CompilerExtension')) {
+	class_alias('Nette\Config\CompilerExtension', 'Nette\DI\CompilerExtension');
+	class_alias('Nette\Config\Compiler', 'Nette\DI\Compiler');
+	class_alias('Nette\Config\Helpers', 'Nette\DI\Config\Helpers');
+}
+
+if (isset(Nette\Loaders\NetteLoader::getInstance()->renamed['Nette\Configurator']) || !class_exists('Nette\Configurator')) {
+	unset(Nette\Loaders\NetteLoader::getInstance()->renamed['Nette\Configurator']); // fuck you
+	class_alias('Nette\Config\Configurator', 'Nette\Configurator');
+}
 
 /**
- * Monolog extension
- *
  * @author Martin Bažík <martin@bazo.sk>
+ * @author Filip Procházka <filip@prochazka.su>
  */
-class MonologExtension extends \Nette\DI\CompilerExtension
+class MonologExtension extends CompilerExtension
 {
 
 	const TAG_HANDLER = 'monolog.handler';
@@ -53,7 +75,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		}
 
 		$builder->addDefinition($this->prefix('adapter'))
-			->setClass('Bazo\Monolog\Adapter\MonologAdapter', [$this->prefix('@logger')])
+			->setClass('Kdyby\Monolog\Diagnostics\MonologAdapter', [$this->prefix('@logger')])
 			->addTag('logger');
 	}
 
@@ -81,14 +103,14 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 				: 'Nette\Diagnostics\Debugger::$logger';
 
 			$logger->addSetup('pushHandler', array(
-				new Statement('Bazo\Monolog\Handler\FallbackNetteHandler', array(new PhpLiteral($code)))
+				new Statement('Kdyby\Monolog\Handler\FallbackNetteHandler', array(new Code\PhpLiteral($code)))
 			));
 		}
 	}
 
 
 
-	public function afterCompile(\Nette\PhpGenerator\ClassType $class)
+	public function afterCompile(Code\ClassType $class)
 	{
 		$config = $this->getConfig($this->defaults);
 
@@ -104,6 +126,15 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 			$initialize->addBody($code, [$this->prefix('adapter')]);
 		}
+	}
+
+
+
+	public static function register(Configurator $configurator)
+	{
+		$configurator->onCompile[] = function ($config, Compiler $compiler) {
+			$compiler->addExtension('monolog', new MonologExtension());
+		};
 	}
 
 }

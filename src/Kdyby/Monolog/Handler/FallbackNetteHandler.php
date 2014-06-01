@@ -1,12 +1,30 @@
 <?php
 
-namespace Bazo\Monolog\Handler;
+/**
+ * This file is part of the Kdyby (http://www.kdyby.org)
+ *
+ * Copyright (c) 2008 Filip Procházka (filip@prochazka.su)
+ *
+ * For the full copyright and license information, please view the file license.md that was distributed with this source code.
+ */
+
+namespace Kdyby\Monolog\Handler;
 
 use Kdyby;
 use Monolog\Handler\AbstractProcessingHandler;
 use Nette;
+use Tracy\Debugger;
+use Tracy\Logger;
 
 
+
+if (!class_exists('Tracy\Debugger')) {
+	class_alias('Nette\Diagnostics\Debugger', 'Tracy\Debugger');
+}
+
+if (!class_exists('Tracy\Logger')) {
+	class_alias('Nette\Diagnostics\Logger', 'Tracy\Logger');
+}
 
 /**
  * @author Filip Procházka <filip@prochazka.su>
@@ -15,13 +33,13 @@ class FallbackNetteHandler extends AbstractProcessingHandler
 {
 
 	/**
-	 * @var \Nette\Diagnostics\Logger
+	 * @var Logger
 	 */
 	private $logger;
 
 
 
-	public function __construct(Nette\Diagnostics\Logger $logger)
+	public function __construct(Logger $logger)
 	{
 		parent::__construct();
 		$this->logger = $logger;
@@ -32,7 +50,7 @@ class FallbackNetteHandler extends AbstractProcessingHandler
 	/**
 	 * Writes the record down to the log of the implementing handler
 	 *
-	 * @param  array $record
+	 * @param  array|\DateTime[] $record
 	 * @return void
 	 */
 	protected function write(array $record)
