@@ -30,7 +30,7 @@ $ composer require kdyby/monolog:@dev
 Documentation
 ------------
 
-Lear more in [documentation](https://github.com/Kdyby/Monolog/blob/master/docs/en/index.md).
+Learn more in [documentation](https://github.com/Kdyby/Monolog/blob/master/docs/en/index.md).
 
 
 
