@@ -18,6 +18,9 @@ use Tracy\Logger;
 
 
 /**
+ * Replaces the default Tracy logger,
+ * which allows to preprocess all messages and pass then to Monolog for processing.
+ *
  * @author Martin Bažík <martin@bazo.sk>
  * @author Filip Procházka <filip@prochazka.su>
  */

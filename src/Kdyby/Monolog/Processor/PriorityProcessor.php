@@ -17,6 +17,9 @@ use Nette;
 
 
 /**
+ * Helps you change the channel name of the record,
+ * when you wanna have multiple log files coming out of your application.
+ *
  * @author Filip Procházka <filip@prochazka.su>
  */
 class PriorityProcessor extends Nette\Object
