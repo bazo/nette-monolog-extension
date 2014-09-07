@@ -120,11 +120,12 @@ class MonologExtension extends CompilerExtension
 
 	public function afterCompile(Code\ClassType $class)
 	{
+		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
 
-		if ($config['hookToTracy'] === TRUE) {
-			$initialize = $class->methods['initialize'];
+		$initialize = $class->methods['initialize'];
 
+		if ($config['hookToTracy'] === TRUE) {
 			if (method_exists('Tracy\Debugger', 'setLogger')) {
 				$code = '\Tracy\Debugger::setLogger($this->getService(?));';
 
@@ -136,6 +137,10 @@ class MonologExtension extends CompilerExtension
 			}
 
 			$initialize->addBody($code, array($this->prefix('adapter')));
+		}
+
+		if (empty(Debugger::$logDirectory)) {
+			$initialize->addBody('Tracy\Debugger::$logDirectory = ?', array($builder->expand('%logDir%')));
 		}
 	}
 
