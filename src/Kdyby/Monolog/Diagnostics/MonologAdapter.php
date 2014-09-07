@@ -40,10 +40,22 @@ class MonologAdapter extends Logger
 
 	public function log($message, $priority = self::INFO)
 	{
+		$context = array();
 		$normalised = $message;
+
 		if (is_array($message)) {
-			if (count($message) >= 2) {
+			if (count($message) >= 2 && preg_match('~\\[[\\d+ -]+\\]~i', $message[0])) {
 				array_shift($message); // first entry is probably time
+			}
+
+			if (isset($message[1]) && (preg_match('~\\@\\s+https?:\\/\\/.+~', $message[1])) || preg_match('~CLI:.+~i', $message[1])) {
+				$context['at'] = ltrim($message[1], '@ ');
+				unset($message[1]);
+			}
+
+			if (isset($message[2]) && preg_match('~\\@\\@\\s+exception\\-.+\\.html~', $message[2])) {
+				$context['tracy'] = ltrim($message[2], '@ ');
+				unset($message[2]);
 			}
 
 			$normalised = implode($message);
@@ -54,10 +66,10 @@ class MonologAdapter extends Logger
 
 		switch ($priority) {
 			case 'access':
-				return $this->monolog->addInfo($normalised, array('priority' => $priority));
+				return $this->monolog->addInfo($normalised, array('priority' => $priority) + $context);
 
 			default:
-				return $this->monolog->addRecord($level, $normalised, array('priority' => $priority));
+				return $this->monolog->addRecord($level, $normalised, array('priority' => $priority) + $context);
 		}
 	}
 
@@ -80,4 +92,3 @@ class MonologAdapter extends Logger
 	}
 
 }
-
