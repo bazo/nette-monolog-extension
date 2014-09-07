@@ -73,22 +73,4 @@ class MonologAdapter extends Logger
 		}
 	}
 
-
-
-	public static function register(Monolog\Logger $monolog)
-	{
-		$adapter = new static($monolog);
-
-		if (method_exists('Tracy\Debugger', 'setLogger')) {
-			$monolog->pushHandler(new FallbackNetteHandler(Debugger::getLogger()));
-			Debugger::setLogger($adapter);
-
-		} else {
-			$monolog->pushHandler(new FallbackNetteHandler(Debugger::$logger));
-			Debugger::$logger = $adapter;
-		}
-
-		return $adapter;
-	}
-
 }
