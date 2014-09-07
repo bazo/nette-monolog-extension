@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Kdyby\Facebook\Extension.
+ * Test: Kdyby\Monolog\Extension.
  *
- * @testCase KdybyTests\Facebook\ExtensionTest
+ * @testCase KdybyTests\Monolog\ExtensionTest
  * @author Filip Procházka <filip@prochazka.su>
- * @package Kdyby\Facebook
+ * @package Kdyby\Monolog
  */
 
-namespace KdybyTests\Facebook;
+namespace KdybyTests\Monolog;
 
 use Kdyby;
 use KdybyTests;
