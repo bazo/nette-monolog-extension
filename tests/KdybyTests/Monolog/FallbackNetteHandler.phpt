@@ -50,7 +50,7 @@ class FallbackNetteHandlerTest extends Tester\TestCase
 		$this->logDir = TEMP_DIR . '/log_' . getmypid() . '_' . number_format(microtime(TRUE), 6, '+', '');
 		@mkdir($this->logDir, 0777, TRUE);
 
-		foreach (array_merge(glob($this->logDir . '/*.log'), glob($this->logDir . '/*.html')) as $logFile) {
+		foreach (glob($this->logDir . '/*.log') as $logFile) {
 			unlink($logFile);
 		}
 
