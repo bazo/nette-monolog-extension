@@ -78,15 +78,15 @@ class ExtensionTest extends Tester\TestCase
 		$logger->addError('logger message 4', array('channel' => 'custom'));
 
 		Assert::match(
-			'[%a%] tracy message 1 [] []' . "\n" .
-			'[%a%] Exception: tracy exception message 2 in %a%:%d% {"tracy":"exception-%a%.html"} []' . "\n" .
+			'[%a%] tracy message 1 {"at":"%a%"} []' . "\n" .
+			'[%a%] Exception: tracy exception message 2 in %a%:%d% {"at":"%a%","tracy":"exception-%a%.html"} []' . "\n" .
 			'[%a%] logger message 1 [] []',
 			file_get_contents(TEMP_DIR . '/info.log')
 		);
 
 		Assert::match(
-			'[%a%] tracy message 2 [] []' . "\n" .
-			'[%a%] Exception: tracy exception message 1 in %a%:%d% {"tracy":"exception-%a%.html"} []' . "\n" .
+			'[%a%] tracy message 2 {"at":"%a%"} []' . "\n" .
+			'[%a%] Exception: tracy exception message 1 in %a%:%d% {"at":"%a%","tracy":"exception-%a%.html"} []' . "\n" .
 			'[%a%] logger message 3 [] []',
 			file_get_contents(TEMP_DIR . '/error.log')
 		);
