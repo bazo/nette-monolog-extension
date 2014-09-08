@@ -57,7 +57,7 @@ class MonologAdapter extends Logger
 
 			$message = array(
 				@date('[Y-m-d H-i-s]'),
-				$this->formatMessage($message, $exceptionFile),
+				$this->formatMessage($message),
 				' @ ' . self::getSource(),
 				$exceptionFile ? ' @@ ' . basename($exceptionFile) : NULL
 			);
@@ -103,33 +103,6 @@ class MonologAdapter extends Logger
 		}
 
 		return isset($context['tracy']) ? $context['tracy'] : '';
-	}
-
-
-
-	/**
-	 * @author David Grudl
-	 * @see https://github.com/nette/tracy/blob/e74741ef285f81ec256e40d22c88a313f686a73c/src/Tracy/Logger.php#L76
-	 * @return string
-	 */
-	protected function formatMessage($value, $exceptionFile = NULL)
-	{
-		if ($value instanceof \Exception) {
-			$tmp = array();
-			while ($value) {
-				$tmp[] = ($value instanceof \ErrorException ?
-						'Fatal error: ' . $value->getMessage()
-						: get_class($value) . ': ' . $value->getMessage()
-					) . ' in ' . $value->getFile() . ':' . $value->getLine();
-				$value = $value->getPrevious();
-			}
-			$value = implode($tmp, "\n" . 'caused by ');
-
-		} elseif (!is_string($value)) {
-			$value = Dumper::toText($value);
-		}
-
-		return trim(preg_replace('#\s*\r?\n\s*#', ' ', $value));
 	}
 
 
