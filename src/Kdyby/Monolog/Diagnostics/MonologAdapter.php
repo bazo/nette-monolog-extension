@@ -13,6 +13,7 @@ namespace Kdyby\Monolog\Diagnostics;
 use Kdyby\Monolog\Handler\FallbackNetteHandler;
 use Monolog;
 use Tracy\Debugger;
+use Tracy\Dumper;
 use Tracy\Logger;
 
 
@@ -53,27 +54,17 @@ class MonologAdapter extends Logger
 	{
 		if (!is_array($message) && method_exists($this, 'logException')) { // forward BC with Nette in 2.3-dev
 			$exceptionFile = $message instanceof \Exception ? $this->logException($message) : NULL;
-			$formatted = $this->formatMessage($message, $exceptionFile);
+
+			$message = array(
+				@date('[Y-m-d H-i-s]'),
+				$this->formatMessage($message, $exceptionFile),
+				' @ ' . self::getSource(),
+				$exceptionFile ? ' @@ ' . basename($exceptionFile) : NULL
+			);
 
 			if (in_array($priority, array(self::ERROR, self::EXCEPTION, self::CRITICAL), TRUE)) {
-				$this->sendEmail($formatted);
+				$this->sendEmail(implode('', $message));
 			}
-
-			$message = array(0, $formatted, ' @ ' . self::getSource(), $exceptionFile ? ' @@ ' . basename($exceptionFile) : NULL);
-			if (preg_match('~^(?P<formatted>.+)(?:\\s+\\@\\@\\s+(?P<tracy>exception\\-[^\\s]+\\.html)\\s*)\z~i', $formatted, $m)) {
-				$message[1] = $formatted = $m['formatted'];
-			}
-
-			if (preg_match('~^(?P<formatted>.+)(?:\\s+\\@\\s+(?P<at>(CLI\\:|https?:\\/\\/).+))\z~i', $formatted, $m)) {
-				$message[1] = $formatted = $m['formatted'];
-			}
-
-			if (preg_match('~^(?P<datetime>\\[[^\\]]+\\])\\s+(?P<message>.+)\z~is', $formatted, $m)) {
-				$message[0] = $m['datetime'];
-				$message[1] = trim($m['message']);
-			}
-
-			unset($formatted);
 		}
 
 		$normalised = $message;
@@ -112,6 +103,33 @@ class MonologAdapter extends Logger
 		}
 
 		return isset($context['tracy']) ? $context['tracy'] : '';
+	}
+
+
+
+	/**
+	 * @author David Grudl
+	 * @see https://github.com/nette/tracy/blob/e74741ef285f81ec256e40d22c88a313f686a73c/src/Tracy/Logger.php#L76
+	 * @return string
+	 */
+	protected function formatMessage($value, $exceptionFile = NULL)
+	{
+		if ($value instanceof \Exception) {
+			$tmp = array();
+			while ($value) {
+				$tmp[] = ($value instanceof \ErrorException ?
+						'Fatal error: ' . $value->getMessage()
+						: get_class($value) . ': ' . $value->getMessage()
+					) . ' in ' . $value->getFile() . ':' . $value->getLine();
+				$value = $value->getPrevious();
+			}
+			$value = implode($tmp, "\n" . 'caused by ');
+
+		} elseif (!is_string($value)) {
+			$value = Dumper::toText($value);
+		}
+
+		return trim(preg_replace('#\s*\r?\n\s*#', ' ', $value));
 	}
 
 
