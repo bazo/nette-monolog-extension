@@ -48,7 +48,7 @@ class MonologExtension extends CompilerExtension
 		$config = $this->getConfig($this->defaults);
 
 		$builder->addDefinition($this->prefix('logger'))
-				->setClass('Monolog\Logger', array($config['name']));
+			->setClass('Kdyby\Monolog\Logger', array($config['name']));
 
 		// change channel name to priority if available
 		$builder->addDefinition($this->prefix('processor.priorityProcessor'))
