@@ -140,7 +140,7 @@ class MonologExtension extends CompilerExtension
 		}
 
 		if (empty(Debugger::$logDirectory)) {
-			$initialize->addBody('Tracy\Debugger::$logDirectory = ?', array($builder->expand('%logDir%')));
+			$initialize->addBody('Tracy\Debugger::$logDirectory = ?;', array($builder->expand('%logDir%')));
 		}
 	}
 
