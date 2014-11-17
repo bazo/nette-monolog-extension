@@ -46,6 +46,7 @@ class MonologExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
+		$builder->parameters[$this->name] = $config;
 
 		$builder->addDefinition($this->prefix('logger'))
 			->setClass('Kdyby\Monolog\Logger', array($config['name']));
