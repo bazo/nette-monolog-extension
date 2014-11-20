@@ -22,11 +22,16 @@ class MonologAdapter implements \Tracy\ILogger
 
 	public function log($message, $priority = self::INFO)
 	{
-		$context = $message;
-		unset($context[0]);
-		unset($context[1]);
-		$message = preg_replace('#\s*\r?\n\s*#', ' ', trim($message[1]));
-
+		if ($message instanceof \Exception) {
+			$message = $message->getMessage();
+			$context = [];
+		} else {
+			$context = $message;
+			unset($context[0]);
+			unset($context[1]);
+			$message = preg_replace('#\s*\r?\n\s*#', ' ', trim($message[1]));
+		}
+		
 		switch ($priority) {
 			case self::DEBUG:
 				return $this->monolog->addDebug($message, $context);
