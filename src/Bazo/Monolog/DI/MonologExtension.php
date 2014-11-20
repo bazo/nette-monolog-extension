@@ -2,31 +2,28 @@
 
 namespace Bazo\Monolog\DI;
 
+
 /**
- * Monolog extension
- *
  * @author Martin Bažík <martin@bazo.sk>
  */
 class MonologExtension extends \Nette\DI\CompilerExtension
 {
 
 	private $defaults = [
-		'handlers' => [],
+		'handlers'	 => [],
 		'processors' => [],
-		'name' => 'App',
-		'useLogger' => TRUE
+		'name'		 => 'App',
+		'useLogger'	 => TRUE
 	];
-	
 	private $useLogger;
-
 
 	public function loadConfiguration()
 	{
-		$containerBuilder = $this->getContainerBuilder();
-		$config = $this->getConfig($this->defaults);
+		$containerBuilder	 = $this->getContainerBuilder();
+		$config				 = $this->getConfig($this->defaults);
 
 		$logger = $containerBuilder->addDefinition($this->prefix('logger'))
-				->setClass('Monolog\Logger', [$config['name']]);
+				->setClass(Monolog\Logger::class, [$config['name']]);
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
 			$this->compiler->parseServices($containerBuilder, [
@@ -48,13 +45,17 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 			$logger->addSetup('pushProcessor', [$this->prefix('@' . $processorName)]);
 		}
 
-		$containerBuilder
-			->addDefinition($this->prefix('adapter'))
-			->addTag('logger')
-			->setClass('Bazo\Monolog\Adapter\MonologAdapter', [$this->prefix('@logger')])
+		$adapterDef = $containerBuilder
+				->addDefinition($this->prefix('adapter'))
+				->addTag('logger')
+				->setClass(Bazo\Monolog\Adapter\MonologAdapter::class, [$this->prefix('@logger')])
 		;
 
 		$this->useLogger = $config['useLogger'];
+
+		if (!$this->useLogger) {
+			$adapterDef->setAutowired(FALSE);
+		}
 	}
 
 
@@ -68,4 +69,3 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 
 }
-

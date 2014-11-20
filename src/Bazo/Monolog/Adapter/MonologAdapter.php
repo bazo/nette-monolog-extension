@@ -2,19 +2,17 @@
 
 namespace Bazo\Monolog\Adapter;
 
+
 use Monolog\Logger;
 
 /**
- * MonologAdapter
- *
  * @author Martin Bažík <martin@bazo.sk>
  */
-class MonologAdapter extends \Nette\Diagnostics\Logger
+class MonologAdapter implements \Tracy\ILogger
 {
 
 	/** @var Logger */
 	private $monolog;
-
 
 	public function __construct(Logger $monolog)
 	{
@@ -37,15 +35,10 @@ class MonologAdapter extends \Nette\Diagnostics\Logger
 				return $this->monolog->addWarning($message[1] . $message[2]);
 			case 'access':
 				return $this->monolog->addNotice($message[1] . $message[2]);
+			case 'emergency':
+				return $this->monolog->addEmergency($message[1] . $message[2]);
 		}
 	}
 
 
-	public static function register(Logger $monolog)
-	{
-		\Nette\Diagnostics\Debugger::$logger = new static($monolog);
-	}
-
-
 }
-

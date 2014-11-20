@@ -1,21 +1,26 @@
 {
-    "name": "bazo/nette-monolog-extension",
-    "type": "nette-addon",
-    "description": "Nette monolog compiler extension",
-    "keywords": ["nette", "monolog", "logging", "extension"],
-    "homepage": "https://github.com/bazo/nette-monolog-extension",
-    "authors": [
-        {
-            "name": "Martin Bažík",
-            "email": "martin@bazo.sk",
-            "homepage": "http://bazo.sk"
-        }
-    ],
-    "require": {
-        "php": ">= 5.4.0",
-        "monolog/monolog": "@dev"
-    },
-    "autoload": {
-        "psr-0": { "Bazo\\Monolog\\": "src/" }
-    }
+	"name": "bazo/nette-monolog-extension",
+	"type": "nette-addon",
+	"description": "Nette monolog compiler extension",
+	"keywords": ["nette", "monolog", "logging", "extension"],
+	"homepage": "https://github.com/bazo/nette-monolog-extension",
+	"authors": [
+		{
+			"name": "Martin Bažík",
+			"email": "martin@bazo.sk",
+			"homepage": "http://bazo.sk"
+		}
+	],
+	"require": {
+		"php": ">= 5.5.0",
+		"tracy/tracy": "*",
+		"nette/di": "*",
+		"monolog/monolog": "*"
+	},
+	"minimum-stability": "dev",
+	"autoload": {
+		"psr-0": {
+			"Bazo": "src/"
+		}
+	}
 }
