@@ -22,7 +22,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		$containerBuilder	 = $this->getContainerBuilder();
 		$config				 = $this->getConfig($this->defaults);
 
-		$logger = $containerBuilder->addDefinition($this->prefix('logger'))
+		$logger = $containerBuilder->addDefinition($this->prefix('monolog'))
 				->setClass(\Monolog\Logger::class, [$config['name']]);
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
@@ -45,17 +45,14 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 			$logger->addSetup('pushProcessor', [$this->prefix('@' . $processorName)]);
 		}
 
-		$adapterDef = $containerBuilder
+		$containerBuilder
 				->addDefinition($this->prefix('adapter'))
 				->addTag('logger')
-				->setClass(\Bazo\Monolog\Adapter\MonologAdapter::class, [$this->prefix('@logger')])
+				->setClass(\Bazo\Monolog\Adapter\MonologAdapter::class, [$this->prefix('@monolog')])
+				->setAutowired($this->useLogger)
 		;
 
 		$this->useLogger = $config['useLogger'];
-
-		if (!$this->useLogger) {
-			$adapterDef->setAutowired(FALSE);
-		}
 	}
 
 
