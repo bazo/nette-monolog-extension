@@ -23,7 +23,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		$config				 = $this->getConfig($this->defaults);
 
 		$logger = $containerBuilder->addDefinition($this->prefix('logger'))
-				->setClass(Monolog\Logger::class, [$config['name']]);
+				->setClass(\Monolog\Logger::class, [$config['name']]);
 
 		foreach ($config['handlers'] as $handlerName => $implementation) {
 			$this->compiler->parseServices($containerBuilder, [
@@ -48,7 +48,7 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 		$adapterDef = $containerBuilder
 				->addDefinition($this->prefix('adapter'))
 				->addTag('logger')
-				->setClass(Bazo\Monolog\Adapter\MonologAdapter::class, [$this->prefix('@logger')])
+				->setClass(\Bazo\Monolog\Adapter\MonologAdapter::class, [$this->prefix('@logger')])
 		;
 
 		$this->useLogger = $config['useLogger'];
