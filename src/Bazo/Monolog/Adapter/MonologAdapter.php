@@ -22,21 +22,30 @@ class MonologAdapter implements \Tracy\ILogger
 
 	public function log($message, $priority = self::INFO)
 	{
+		$context = $message;
+		unset($context[0]);
+		unset($context[1]);
+		$message = preg_replace('#\s*\r?\n\s*#', ' ', trim($message[1]));
+
 		switch ($priority) {
 			case self::DEBUG:
-				return $this->monolog->addDebug($message[1] . $message[2]);
+				return $this->monolog->addDebug($message, $context);
 			case self::CRITICAL:
-				return $this->monolog->addCritical($message[1] . $message[2]);
+				return $this->monolog->addCritical($message, $context);
 			case self::ERROR:
-				return $this->monolog->addError($message[1] . $message[2]);
+				return $this->monolog->addError($message, $context);
+			case self::EXCEPTION:
+				return $this->monolog->addEmergency($message, $context);
 			case self::INFO:
-				return $this->monolog->addInfo($message[1] . $message[2]);
+				return $this->monolog->addInfo($message, $context);
 			case self::WARNING:
-				return $this->monolog->addWarning($message[1] . $message[2]);
+				return $this->monolog->addWarning($message, $context);
 			case 'access':
-				return $this->monolog->addNotice($message[1] . $message[2]);
+				return $this->monolog->addNotice($message, $context);
 			case 'emergency':
-				return $this->monolog->addEmergency($message[1] . $message[2]);
+				return $this->monolog->addEmergency($message, $context);
+			default:
+				return $this->monolog->addRecord($priority, $message, $context);
 		}
 	}
 
