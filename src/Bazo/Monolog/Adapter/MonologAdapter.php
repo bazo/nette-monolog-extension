@@ -25,13 +25,15 @@ class MonologAdapter implements \Tracy\ILogger
 		if ($message instanceof \Exception) {
 			$message = $message->getMessage();
 			$context = [];
+		} elseif (is_string($message)) {
+			$context = [];
 		} else {
 			$context = $message;
 			unset($context[0]);
 			unset($context[1]);
 			$message = preg_replace('#\s*\r?\n\s*#', ' ', trim($message[1]));
 		}
-		
+
 		switch ($priority) {
 			case self::DEBUG:
 				return $this->monolog->addDebug($message, $context);
