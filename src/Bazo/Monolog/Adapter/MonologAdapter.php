@@ -50,7 +50,7 @@ class MonologAdapter implements \Tracy\ILogger
 			case 'emergency':
 				return $this->monolog->addEmergency($message, $context);
 			default:
-				return $this->monolog->addInfo($priority, $message, $context);
+				return $this->monolog->addInfo($message, $context);
 		}
 	}
 
