@@ -43,8 +43,6 @@ class MonologAdapter implements \Tracy\ILogger
 				return $this->monolog->addError($message, $context);
 			case self::EXCEPTION:
 				return $this->monolog->addEmergency($message, $context);
-			case self::INFO:
-				return $this->monolog->addInfo($message, $context);
 			case self::WARNING:
 				return $this->monolog->addWarning($message, $context);
 			case 'access':
@@ -52,7 +50,7 @@ class MonologAdapter implements \Tracy\ILogger
 			case 'emergency':
 				return $this->monolog->addEmergency($message, $context);
 			default:
-				return $this->monolog->addRecord($priority, $message, $context);
+				return $this->monolog->addInfo($priority, $message, $context);
 		}
 	}
 
