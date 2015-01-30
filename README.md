@@ -23,7 +23,7 @@ Installation
 The best way to install Kdyby/Monolog is using  [Composer](http://getcomposer.org/):
 
 ```sh
-$ composer require kdyby/monolog:~1.0
+$ composer require kdyby/monolog
 ```
 
 
