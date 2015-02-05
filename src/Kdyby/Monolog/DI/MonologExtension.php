@@ -166,4 +166,3 @@ class MonologExtension extends CompilerExtension
 	}
 
 }
-
