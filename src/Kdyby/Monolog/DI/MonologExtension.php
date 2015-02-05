@@ -87,20 +87,21 @@ class MonologExtension extends CompilerExtension
 			$builder->getDefinition($serviceName)->addTag(self::TAG_PROCESSOR);
 		}
 
-		if ($existing = $builder->getByType('Tracy\ILogger')) {
-			$builder->removeDefinition($existing);
-
-		} elseif ($builder->hasDefinition('tracy.logger')) {
-			$builder->removeDefinition($existing = 'tracy.logger');
-		}
-
 		// Tracy adapter
 		$builder->addDefinition($this->prefix('adapter'))
 			->setClass('Kdyby\Monolog\Diagnostics\MonologAdapter', array($this->prefix('@logger')))
 			->addTag('logger');
 
-		if (!empty($existing) && method_exists($builder, 'addAlias')) {
-			$builder->addAlias($existing, $this->prefix('adapter'));
+		if ($builder->hasDefinition('tracy.logger')) { // since Nette 2.3
+			$builder->removeDefinition($existing = 'tracy.logger');
+
+			if (method_exists($builder, 'addAlias')) { // since Nette 2.3
+				$builder->addAlias($existing, $this->prefix('adapter'));
+
+			} else { // old way of providing BC
+				$builder->addDefinition($existing)
+					->setFactory($this->prefix('@adapter'));
+			}
 		}
 	}
 
