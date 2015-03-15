@@ -38,7 +38,7 @@ class ExtensionTest extends Tester\TestCase
 		$config = new Nette\Configurator();
 		$config->setTempDirectory(TEMP_DIR);
 		Kdyby\Monolog\DI\MonologExtension::register($config);
-		$config->addConfig(__DIR__ . '/../nette-reset.neon', $config::NONE);
+		$config->addConfig(__DIR__ . '/../nette-reset.neon', !isset($config->defaultExtensions['nette']) ? 'v23' : 'v22');
 
 		return $config->createContainer();
 	}
