@@ -29,6 +29,18 @@ class MonologAdapter extends Logger
 {
 
 	/**
+	 * @var array
+	 */
+	private $priorityMap = array(
+		self::DEBUG => Monolog\Logger::DEBUG,
+		self::INFO => Monolog\Logger::INFO,
+		self::WARNING => Monolog\Logger::WARNING,
+		self::ERROR => Monolog\Logger::ERROR,
+		self::EXCEPTION => Monolog\Logger::CRITICAL,
+		self::CRITICAL => Monolog\Logger::CRITICAL
+	);
+
+	/**
 	 * @var Monolog\Logger
 	 */
 	private $monolog;
@@ -90,21 +102,35 @@ class MonologAdapter extends Logger
 			$normalised = implode($message);
 		}
 
-		$levels = $this->monolog->getLevels();
-		$level = isset($levels[$uPriority = strtoupper($priority)]) ? $levels[$uPriority] : Monolog\Logger::INFO;
-
 		switch ($priority) {
 			case 'access':
 				$this->monolog->addInfo($normalised, array('priority' => $priority) + $context);
 				break;
 
 			default:
-				$this->monolog->addRecord($level, $normalised, array('priority' => $priority) + $context);
+				$this->monolog->addRecord(
+					$this->getLevel($priority),
+					$normalised,
+					array('priority' => $priority) + $context
+				);
 		}
-
 		return isset($context['tracy']) ? $context['tracy'] : '';
 	}
 
+
+	/**
+	 * @param string $priority
+	 * @return int
+	 */
+	protected function getLevel($priority)
+	{
+		if (isset($this->priorityMap[$priority])) {
+			return $this->priorityMap[$priority];
+		}
+
+		$levels = $this->monolog->getLevels();
+		return isset($levels[$uPriority = strtoupper($priority)]) ? $levels[$uPriority] : Monolog\Logger::INFO;
+	}
 
 
 	/**
