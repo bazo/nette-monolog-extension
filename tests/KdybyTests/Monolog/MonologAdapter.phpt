@@ -125,7 +125,7 @@ class MonologAdapterTest extends Tester\TestCase
 		list($record) = $this->testHandler->getRecords();
 		Assert::same('kdyby', $record['channel']);
 		Assert::same('test message', $record['message']);
-		Assert::same('INFO', $record['level_name']);
+		Assert::same('CRITICAL', $record['level_name']);
 		Assert::same('exception', $record['context']['priority']);
 		Assert::same('https://www.kdyby.org/', $record['context']['at']);
 		Assert::same('exception-2014-08-14-11-11-26-88167e58be9dc0dfd12a61b3d8d33838.html', $record['context']['tracy']);
