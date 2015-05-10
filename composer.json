@@ -18,8 +18,8 @@
 		}
 	],
 	"require": {
-		"nette/di": "~2.2@dev",
-		"tracy/tracy": "~2.2@dev",
+		"nette/di": "~2.3@dev",
+		"tracy/tracy": "~2.3@dev",
 
 		"monolog/monolog": "~1.9"
 	},
@@ -62,7 +62,7 @@
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "1.0-dev"
+			"dev-master": "1.1-dev"
 		}
 	}
 }
