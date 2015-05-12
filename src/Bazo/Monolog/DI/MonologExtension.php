@@ -58,9 +58,10 @@ class MonologExtension extends \Nette\DI\CompilerExtension
 
 	public function afterCompile(\Nette\PhpGenerator\ClassType $class)
 	{
+
 		if ($this->useLogger === TRUE) {
 			$initialize = $class->methods['initialize'];
-			$initialize->addBody('\Nette\Diagnostics\Debugger::$logger = $this->getService(?);', [$this->prefix('adapter')]);
+			$initialize->addBody('\Tracy\Debugger::setLogger($this->getService(?));', [$this->prefix('adapter')]);
 		}
 	}
 
