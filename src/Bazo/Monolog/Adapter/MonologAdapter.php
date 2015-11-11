@@ -31,7 +31,9 @@ class MonologAdapter implements \Tracy\ILogger
 			$context = $message;
 			unset($context[0]);
 			unset($context[1]);
-			$message = preg_replace('#\s*\r?\n\s*#', ' ', trim($message[1]));
+			if (isset($message[1])) {
+				$message = preg_replace('#\s*\r?\n\s*#', ' ', trim($message[1]));
+			}
 		}
 
 		switch ($priority) {
