@@ -41,7 +41,7 @@ Tracy integration
 The adapter replaces the default logger instance and you should not tinker with it anymore.
 To put it simply: use Monolog handlers, do not change the logger anymore.
 
-You can ofcourse turn off the registration into Tracy
+You can of course turn off the registration into Tracy
 
 ```yml
 monolog:
@@ -80,7 +80,7 @@ What does this do? It creates file `logs/emails.log` and writes the given messag
 Because `emails` is not a standard message level name, Monolog would have failed to process it.
 Therefore messages like this are sent with level `info` and the real name is set to `context.priority`, you'll see why in a moment.
 
-Ofcourse, when you install Monolog, this becomes obsolete, as you can start using the `Logger` object instead of static method.
+Of course, when you install Monolog, this becomes obsolete, as you can start using the `Logger` object instead of static method.
 
 
 Processors
