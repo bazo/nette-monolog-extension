@@ -4,6 +4,7 @@ Kdyby/Monolog
 [![Build Status](https://travis-ci.org/Kdyby/Monolog.svg?branch=master)](https://travis-ci.org/Kdyby/Monolog)
 [![Downloads this Month](https://img.shields.io/packagist/dm/kdyby/monolog.svg)](https://packagist.org/packages/kdyby/monolog)
 [![Latest stable](https://img.shields.io/packagist/v/kdyby/monolog.svg)](https://packagist.org/packages/kdyby/monolog)
+[![Join the chat at https://gitter.im/Kdyby/Help](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Kdyby/Help)
 
 Integration of [Monolog](https://github.com/Seldaek/monolog) into Nette Framework
 
