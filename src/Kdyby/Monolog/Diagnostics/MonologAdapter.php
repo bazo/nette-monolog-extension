@@ -10,10 +10,8 @@
 
 namespace Kdyby\Monolog\Diagnostics;
 
-use Kdyby\Monolog\Handler\FallbackNetteHandler;
 use Monolog;
 use Tracy\Debugger;
-use Tracy\Dumper;
 use Tracy\Logger;
 
 
@@ -89,7 +87,7 @@ class MonologAdapter extends Logger
 				array_shift($message); // first entry is probably time
 			}
 
-			if (isset($message[1]) && (preg_match('~\\@\\s+https?:\\/\\/.+~', $message[1])) || preg_match('~CLI:.+~i', $message[1])) {
+			if (isset($message[1]) && (preg_match('~\\@\\s+https?:\\/\\/.+~', $message[1]) || preg_match('~CLI:.+~i', $message[1]))) {
 				$context['at'] = ltrim($message[1], '@ ');
 				unset($message[1]);
 			}
