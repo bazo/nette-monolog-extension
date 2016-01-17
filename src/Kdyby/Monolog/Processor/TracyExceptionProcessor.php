@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file is part of the Kdyby (http://www.kdyby.org)
+ *
+ * Copyright (c) 2008 Filip Procházka (filip@prochazka.su)
+ *
+ * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
+ */
+
 namespace Kdyby\Monolog\Processor;
 
 use Kdyby\Monolog\Diagnostics\TracyLogger;
@@ -11,6 +19,9 @@ use Tracy\Debugger;
 class TracyExceptionProcessor
 {
 
+	/**
+	 * @var array
+	 */
 	private $processedExceptionFileNames = [];
 
 	/**
@@ -18,17 +29,10 @@ class TracyExceptionProcessor
 	 */
 	private $tracyLogger;
 
-	/**
-	 * @var string
-	 */
-	private $baseUrl;
 
 
-
-	public function __construct($tracyDir, $baseUrl)
+	public function __construct($tracyDir)
 	{
-		$this->baseUrl = rtrim($baseUrl, '/');
-
 		if (version_compare(Debugger::VERSION, '2.3.3', '>=')) {
 			$this->tracyLogger = new TracyLogger($tracyDir);
 		} else {
@@ -49,10 +53,6 @@ class TracyExceptionProcessor
 			}
 
 			$record['context']['tracy'] = ltrim(strrchr($fileName, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR);
-		}
-
-		if (isset($record['context']['tracy'])) {
-			$record['context']['tracyUrl'] = sprintf('%s/%s', $this->baseUrl, $record['context']['tracy']);
 		}
 
 		return $record;
