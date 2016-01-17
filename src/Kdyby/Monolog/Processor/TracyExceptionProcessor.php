@@ -2,10 +2,11 @@
 
 namespace Kdyby\Monolog\Processor;
 
-use Kdyby\Monolog\Diagnostics\MonologAdapter;
 use Kdyby\Monolog\Diagnostics\TracyLogger;
 use Kdyby\Monolog\Diagnostics\TracyLoggerOld;
 use Tracy\Debugger;
+
+
 
 class TracyExceptionProcessor
 {
@@ -22,6 +23,8 @@ class TracyExceptionProcessor
 	 */
 	private $baseUrl;
 
+
+
 	public function __construct($tracyDir, $baseUrl)
 	{
 		$this->baseUrl = rtrim($baseUrl, '/');
@@ -32,6 +35,8 @@ class TracyExceptionProcessor
 			$this->tracyLogger = new TracyLoggerOld($tracyDir);
 		}
 	}
+
+
 
 	public function __invoke(array $record)
 	{

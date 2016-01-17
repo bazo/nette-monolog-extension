@@ -4,6 +4,8 @@ namespace Kdyby\Monolog\Diagnostics;
 
 use Tracy\Logger;
 
+
+
 class TracyLoggerOld extends Logger
 {
 
@@ -14,6 +16,8 @@ class TracyLoggerOld extends Logger
 	{
 		return parent::getExceptionFile($exception);
 	}
+
+
 
 	/**
 	 * @return string

@@ -4,6 +4,8 @@ namespace Kdyby\Monolog\Diagnostics;
 
 use Tracy\Logger;
 
+
+
 class TracyLogger extends Logger
 {
 
