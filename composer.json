@@ -21,7 +21,7 @@
 		"nette/di": "~2.3@dev",
 		"tracy/tracy": "~2.3@dev",
 
-		"monolog/monolog": "~1.9"
+		"monolog/monolog": "~1.10"
 	},
 	"require-dev": {
 		"nette/application": "~2.3@dev",
