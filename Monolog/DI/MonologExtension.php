@@ -51,6 +51,15 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 		],
 	];
 
+
+	/**
+	 * Pass given arguments to DI\Compiler::loadDefinitions() (v2.4) or DI\Compiler::parseServices() (v2.3) according to current Nette version.
+	 */
+	protected function loadDefinitions(DI\ContainerBuilder $builder, array $config, $namespace = NULL) {
+		if (method_exists('Nette\DI\Compiler', 'loadDefinitions')) return DI\Compiler::loadDefinitions($builder, $config, $namespace);
+		return DI\Compiler::parseServices($builder, ['services' => $config], $namespace);
+	}
+
 	public function loadConfiguration()
 	{
 		$builder = $this->getContainerBuilder();
@@ -58,7 +67,8 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 
 		//FORMATTERS
 		foreach ($config['formatters'] as $formatterName => $formatter) {
-			DI\Compiler::loadDefinitions($builder, [
+			// DI\Compiler::loadDefinitions($builder, [
+			$this->loadDefinitions($builder, [
 				$this->prefix('formatter.' . $formatterName) => [
 					'class' => $formatter,
 					'tags' => [
@@ -70,7 +80,8 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 
 		//PROCESSORS
 		foreach ($config['processors'] as $processorName => $processor) {
-			DI\Compiler::loadDefinitions($builder, [
+			// DI\Compiler::loadDefinitions($builder, [
+			$this->loadDefinitions($builder, [
 				$this->prefix('processor.' . $processorName) => [
 					'class' => $processor,
 					'tags' => [
@@ -86,7 +97,8 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 				throw new \Nette\UnexpectedValueException("Wrong handler format. Handlers configuration must be in this format:\n\nhandlers:\n\t{$handlerName}:\n\t\tclass: $handlerConfig\n\t\t[formatter: formatterName]\n\t\t[processors: [processorName, ...]]");
 			}
 
-			DI\Compiler::loadDefinitions($builder, [
+			// DI\Compiler::loadDefinitions($builder, [
+			$this->loadDefinitions($builder, [
 				$serviceName = $this->prefix('handler.' . $handlerName) => [
 					'class' => $handlerConfig['class'],
 					'tags' => [
@@ -124,7 +136,8 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 					throw new \Nette\UnexpectedValueException("Wrong logger format. Loggers configuration must be in this format:\n\nloggers:\n\t{$loggerName}:\n\t\tclass: $loggerConfig\n\t\t[processors: [processorName, ...]]\n\t\t[handlers: [handlerName, ...]]");
 				}
 
-				DI\Compiler::loadDefinitions($builder, [
+				// DI\Compiler::loadDefinitions($builder, [
+				$this->loadDefinitions($builder, [
 					$serviceName = $this->prefix('logger.' . $loggerName) => [
 						'class' => $loggerConfig['class'],
 						'arguments' => [
