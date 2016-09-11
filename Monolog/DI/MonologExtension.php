@@ -54,10 +54,15 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 
 	/**
 	 * Pass given arguments to DI\Compiler::loadDefinitions() (v2.4) or DI\Compiler::parseServices() (v2.3) according to current Nette version.
+	 * @param Nette\DI\ContainerBuilder $builder
+	 * @param array $config
+	 * @param string $namespace (optional)
+	 * @return void
 	 */
-	protected function loadDefinitions(DI\ContainerBuilder $builder, array $config, $namespace = NULL) {
-		if (method_exists('Nette\DI\Compiler', 'loadDefinitions')) return DI\Compiler::loadDefinitions($builder, $config, $namespace);
-		return DI\Compiler::parseServices($builder, ['services' => $config], $namespace);
+	protected function loadDefinitions(DI\ContainerBuilder $builder, array $config, $namespace = NULL)
+	{
+		if (method_exists('Nette\DI\Compiler', 'loadDefinitions')) DI\Compiler::loadDefinitions($builder, $config, $namespace);
+		else DI\Compiler::parseServices($builder, ['services' => $config], $namespace);
 	}
 
 	public function loadConfiguration()
