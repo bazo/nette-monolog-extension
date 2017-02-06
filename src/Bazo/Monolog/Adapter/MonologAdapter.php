@@ -22,7 +22,7 @@ class MonologAdapter implements \Tracy\ILogger
 
 	public function log($message, $priority = self::INFO)
 	{
-		if ($message instanceof \Exception) {
+		if ($message instanceof \Throwable) {
 			$message = $message->getMessage();
 			$context = [];
 		} elseif (is_string($message)) {
